@@ -6,7 +6,7 @@
 /*   By: jaukes <jaukes@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2026/10/16 12:56:39 by jaukes        #+#    #+#                 */
-/*   Updated: 2026/10/19 23:20:15 by jaukes        ########   odam.nl         */
+/*   Updated: 2026/10/20 12:09:04 by jaukes        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,14 @@ void	fmt_txt(t_output *o, const t_spec *spec, va_list *ap)
 	{
 		s = va_arg(*ap, char *);
 		if (!s)
+		{
 			s = "(null)";
-		len = min_int(spec->prec, (int)ft_strlen(s));
+			len = 6;
+		}
+		else if (spec->prec != -1)
+			len = min_int(spec->prec, (int)ft_strlen(s));
+		else
+			len = 0;
 	}
 	fmt_txt_padded(o, spec, s, len);
 }
