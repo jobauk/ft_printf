@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 static const t_conv	g_formatters[] = {
-{'%', fmt_txt},
+{'%', fmt_percent},
 {'c', fmt_txt},
 {'s', fmt_txt},
 {'p', fmt_ptr},
@@ -78,6 +78,7 @@ int	ft_printf(const char *fmt, ...)
 			parse_spec(&fmt, &spec, &ap);
 			fmt_field(&output, &spec, &ap);
 			write_field(&writer, &output);
+			output.n = 0;
 		}
 	}
 	va_end(ap);

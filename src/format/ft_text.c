@@ -34,9 +34,7 @@ void	fmt_txt(t_output *o, const t_spec *spec, va_list *ap)
 
 	len = 1;
 	s = &o->buf[0];
-	if (spec->conv == '%')
-		o->buf[0] = '%';
-	else if (spec->conv == 'c')
+	if (spec->conv == 'c')
 		o->buf[0] = (char)va_arg(*ap, int);
 	else if (spec->conv == 's')
 	{
@@ -44,12 +42,24 @@ void	fmt_txt(t_output *o, const t_spec *spec, va_list *ap)
 		if (!s)
 		{
 			s = "(null)";
-			len = 6;
+			len = 0;
+			if (spec->prec == -1 || spec->prec >= 6)
+				len = 6;
 		}
 		else if (spec->prec != -1)
 			len = min_int(spec->prec, (int)ft_strlen(s));
 		else
-			len = 0;
+			len = (int)ft_strlen(s);
 	}
 	fmt_txt_padded(o, spec, s, len);
+}
+
+void	fmt_percent(t_output *o, const t_spec *spec, va_list *ap)
+{
+	(void)ap;
+	t_spec	nspec;
+
+	nspec = (t_spec){spec->flags, 0, -1, spec->conv};
+	o->buf[0] = '%';
+	fmt_txt_padded(o, &nspec, &o->buf[0], 1);
 }

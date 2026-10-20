@@ -14,30 +14,23 @@
 #include "../ft_spec.h"
 #include "../ft_strutils.h"
 #include "../ft_utils.h"
+#include <stdint.h>
 
 static void	fmt_number(t_output *o, const t_spec *s, t_nbfmt n)
 {
-	const char	*sign;
 	int			len;
 	int			zeros;
 	int			padding;
 
-	sign = 0x0;
 	len = umaxtostr(&o->buf, n.nb, n.digits) * !(s->prec == 0 && n.nb == 0);
 	zeros = max_int(0, s->prec - len);
-	if (n.neg)
-		sign = "-";
-	else if (s->flags & F_SIGN)
-		sign = "+";
-	else if (s->flags & F_BLANK)
-		sign = " ";
-	padding = max_int(0, s->width - (!!sign + zeros + len));
+	padding = max_int(0, s->width - ((int)ft_strlen(n.prefix) + zeros + len));
 	if (!(s->flags & F_LEFT) && (s->flags & F_ZERO) && s->prec == -1)
 		zeros += padding;
 	else if (!(s->flags & F_LEFT))
 		o->tokens[o->n++] = token_repeat(' ', padding);
-	if (sign)
-		o->tokens[o->n++] = token_span(sign, 1);
+	if (n.prefix)
+		o->tokens[o->n++] = token_span(n.prefix, (int)ft_strlen(n.prefix));
 	o->tokens[o->n++] = token_repeat('0', zeros);
 	o->tokens[o->n++] = token_span((o->buf + UINTMAX_BITS - len), len);
 	if (s->flags & F_LEFT)
@@ -47,38 +40,65 @@ static void	fmt_number(t_output *o, const t_spec *s, t_nbfmt n)
 void	fmt_ptr(t_output *o, const t_spec *spec, va_list *ap)
 {
 	void	*ptr;
+	t_nbfmt	nbfmt;
 
 	ptr = va_arg(*ap, void *);
+	nbfmt = (t_nbfmt){.prefix = "0x", .digits = HEX_DIGITS};
 	if (!ptr)
 		fmt_txt_padded(o, spec, "(nil)", 5);
 	else
-		fmt_number(o, spec, (t_nbfmt){(uintptr_t)ptr, "0123456789abcdef", 0});
+	{
+		nbfmt.nb = (uintptr_t)ptr;
+		fmt_number(o, spec, nbfmt);
+	}
 }
 
 void	fmt_int(t_output *o, const t_spec *spec, va_list *ap)
 {
 	int		nb;
+	t_nbfmt	nbfmt;
 
 	nb = va_arg(*ap, int);
+	nbfmt = (t_nbfmt){.prefix = NULL, .digits = DECIMAL_DIGITS};
+	if (spec->flags & F_SIGN)
+		nbfmt.prefix = "+";
+	else if (spec->flags & F_BLANK)
+		nbfmt.prefix = " ";
 	if (nb < 0)
-		fmt_number(o, spec,
-			(t_nbfmt){(uintmax_t)(-(unsigned)nb), "0123456789", 1});
+	{
+		nbfmt.prefix = "-";
+		nbfmt.nb = (uintmax_t)(-(unsigned)nb);
+	}
 	else
-		fmt_number(o, spec, (t_nbfmt){(uintmax_t)nb, "0123456789", 0});
+		nbfmt.nb = (uintmax_t)nb;
+	fmt_number(o, spec, nbfmt);
 }
 
 void	fmt_uint(t_output *o, const t_spec *spec, va_list *ap)
 {
-	fmt_number(o, spec, (t_nbfmt){va_arg(*ap, unsigned int), "0123456789", 0});
+	t_nbfmt	nbfmt;
+
+	nbfmt = (t_nbfmt){NULL, DECIMAL_DIGITS, va_arg(*ap, unsigned int), };
+	fmt_number(o, spec, nbfmt);
 }
 
 void	fmt_hex(t_output *o, const t_spec *spec, va_list *ap)
 {
 	unsigned int	nb;
+	t_nbfmt			nbfmt;
 
 	nb = va_arg(*ap, unsigned int);
+	nbfmt = (t_nbfmt){.prefix = NULL, .nb = nb};
 	if (spec->conv == 'x')
-		fmt_number(o, spec, (t_nbfmt){nb, "0123456789abcdef", 0});
+		nbfmt.digits = HEX_DIGITS;
 	else if (spec->conv == 'X')
-		fmt_number(o, spec, (t_nbfmt){nb, "0123456789ABCDEF", 0});
+		nbfmt.digits = HEX_DIGITS_UPPER;
+	if (spec->flags & F_ALT && nb)
+	{
+		if (spec->conv == 'x')
+			nbfmt.prefix = "0x";
+		if (spec->conv == 'X')
+			nbfmt.prefix = "0X";
+	}
+	fmt_number(o, spec, nbfmt);
 }
