@@ -18,7 +18,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CFLAGS := -Wall -Wextra -Werror -pedantic -MMD -MP $(INC_FLAGS)
 LD_FLAGS := -fsanitize=address,undefined
 DEBUG_CFLAGS := $(CFLAGS) \
-	-g3 -O1 -fno-omit-frame-pointer \
+	-g3 -O0 -fno-omit-frame-pointer \
 	-fstrict-aliasing -Wcast-align \
 	-Wconversion -Wsign-conversion \
 	-Wshadow -Wundef \
@@ -45,6 +45,8 @@ run: $(BIN)
 
 debug: $(DEBUG_BIN)
 	@$(DEBUGGER) $<
+
+build: $(DEBUG_BIN)
 
 $(BIN): $(OBJS)
 	@$(CC) $^ -o $@
