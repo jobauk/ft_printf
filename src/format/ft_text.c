@@ -56,9 +56,9 @@ void	fmt_txt(t_output *o, const t_spec *spec, va_list *ap)
 
 void	fmt_percent(t_output *o, const t_spec *spec, va_list *ap)
 {
-	(void)ap;
 	t_spec	nspec;
 
+	(void)ap;
 	nspec = (t_spec){spec->flags, 0, -1, spec->conv};
 	o->buf[0] = '%';
 	fmt_txt_padded(o, &nspec, &o->buf[0], 1);
