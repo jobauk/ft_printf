@@ -6,7 +6,7 @@
 /*   By: jaukes <jaukes@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2026/10/16 12:56:39 by jaukes        #+#    #+#                 */
-/*   Updated: 2026/10/19 23:17:31 by jaukes        ########   odam.nl         */
+/*   Updated: 2026/11/19 14:33:55 by jaukes        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ static void	fmt_number(t_output *o, const t_spec *s, t_nbfmt n)
 	if (n.prefix)
 		o->tokens[o->n++] = token_span(n.prefix, (int)ft_strlen(n.prefix));
 	o->tokens[o->n++] = token_repeat('0', zeros);
-	o->tokens[o->n++] = token_span((o->buf + UINTMAX_BITS - len), len);
+	o->tokens[o->n++] = token_span((o->buf
+				+ sizeof(uintmax_t) * CHAR_BIT - len), len);
 	if (s->flags & F_LEFT)
 		o->tokens[o->n++] = token_repeat(' ', padding);
 }

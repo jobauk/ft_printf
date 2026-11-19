@@ -18,8 +18,6 @@
 # include <stdarg.h>
 # include <stdint.h>
 
-# define UINTMAX_BITS (sizeof(uintmax_t) * CHAR_BIT)
-
 typedef struct s_repeat
 {
 	char	c;
@@ -50,7 +48,7 @@ typedef struct s_token
 
 typedef struct s_output
 {
-	char	buf[UINTMAX_BITS];
+	char	buf[sizeof(uintmax_t) * CHAR_BIT];
 	t_token	tokens[8];
 	int		n;
 }	t_output;

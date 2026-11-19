@@ -6,7 +6,7 @@
 /*   By: jaukes <jaukes@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2026/10/16 12:56:39 by jaukes        #+#    #+#                 */
-/*   Updated: 2026/10/19 23:17:56 by jaukes        ########   odam.nl         */
+/*   Updated: 2026/11/19 14:24:07 by jaukes        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static const t_conv	g_formatters[] = {
 {'X', fmt_hex}
 };
 
-static void	fmt_field(t_output *o, t_spec *spec, va_list *ap)
+static int	fmt_field(t_output *o, t_spec *spec, va_list *ap)
 {
 	size_t	i;
 
@@ -41,6 +41,10 @@ static void	fmt_field(t_output *o, t_spec *spec, va_list *ap)
 		}
 		i++;
 	}
+	if (i == sizeof(g_formatters) / sizeof(g_formatters[0])
+		&& spec->conv != g_formatters[i - 1].conv)
+		return (-1);
+	return (0);
 }
 
 static void	write_field(t_writer *w, t_output *o)
@@ -76,7 +80,8 @@ int	ft_printf(const char *fmt, ...)
 		else
 		{
 			parse_spec(&fmt, &spec, &ap);
-			fmt_field(&output, &spec, &ap);
+			if (fmt_field(&output, &spec, &ap) != 0)
+				return (-1);
 			write_field(&writer, &output);
 			output.n = 0;
 		}
@@ -91,40 +96,44 @@ int	ft_printf(const char *fmt, ...)
 
 // int	main(void)
 // {
-// 	// {	ft_printf("\n[%#-8.5x]\n", 42);
-// 	// 	printf("\n[%#-8.5x]\n\n", 42);
-// 	// }
+	// {	ft_printf("\n[%#-8.5x]\n", 42);
+	// 	printf("\n[%#-8.5x]\n\n", 42);
+	// }
 
-// 	// {	ft_printf("\n[%#08x]\n", 42);
-// 	// 	printf("\n[%#08x]\n\n", 42);
-// 	// }
+	// {	ft_printf("\n[%#08x]\n", 42);
+	// 	printf("\n[%#08x]\n\n", 42);
+	// }
 
-// 	{	ft_printf("\n[%08.2d]\n", 42);
-// 		printf("\n[%08.2d]\n\n", 42);
-// 	}
+	// {	ft_printf("\n[%08.2d]\n", 42);
+	// 	printf("\n[%08.2d]\n\n", 42);
+	// }
 
-// 	{	ft_printf("\n[%-8d]\n", 42);
-// 		printf("\n[%-8d]\n\n", 42);
-// 	}
+	// {	ft_printf("\n[%-8d]\n", 42);
+	// 	printf("\n[%-8d]\n\n", 42);
+	// }
 
-// 	{	ft_printf("\n[%8d]\n", 42);
-// 		printf("\n[%8d]\n\n", 42);
-// 	}
+	// {	ft_printf("\n[%8d]\n", 42);
+	// 	printf("\n[%8d]\n\n", 42);
+	// }
 
-// 	{	ft_printf("\n[%-8d]\n", 42);
-// 		printf("\n[%-8d]\n\n", 42);
-// 	}
+	// {	ft_printf("\n[%-8d]\n", 42);
+	// 	printf("\n[%-8d]\n\n", 42);
+	// }
 
-// 	{	ft_printf("\n[%-8.5s]\n", "hello, world");
-// 		printf("\n[%-8.5s]\n\n", "hello, world");
-// 	}
+	// {	ft_printf("\n[%-8.5s]\n", "hello, world");
+	// 	printf("\n[%-8.5s]\n\n", "hello, world");
+	// }
 
-// 	{	ft_printf("\n[%-8.5%]\n");
-// 		printf("\n[%-8.5%]\n\n");
-// 	}
+	// {	ft_printf("\n[%-8.5%]\n");
+	// 	printf("\n[%-8.5%]\n\n");
+	// }
 
-// 	{	ft_printf("\n[%8.5%]\n");
-// 		printf("\n[%8.5%]\n\n");
+	// {	ft_printf("\n[%8.5%]\n");
+	// 	printf("\n[%8.5%]\n\n");
+	// }
+
+// 	{	ft_printf("\n[%]\n");
+// 		printf("\n[%]\n\n");
 // 	}
 
 // 	return (0);
